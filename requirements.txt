@@ -1,0 +1,13 @@
+cffi==1.7.0
+cryptography==1.4
+enum34==1.1.6
+gevent==1.1.2
+greenlet==0.4.10
+idna==2.1
+ipaddress==1.0.16
+parallel-ssh==0.91.2
+paramiko==2.0.2
+pyasn1==0.1.9
+pycparser==2.14
+requests==2.11.0
+six==1.10.0
