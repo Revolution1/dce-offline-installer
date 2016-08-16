@@ -70,10 +70,7 @@ def download(url, filename=None, path='', stream_info=None, exit_flag=None):
     :param exit_flag: if cancel download
     :type exit_flag: ExitFlag
     """
-    if path and not os.path.isdir(path):
-        if os.path.isfile(path):
-            raise NameError("Path %s already exist and it's not a dir." % path)
-        os.mkdir(path)
+    ensure_path(path)
     exit_flag = exit_flag or ExitFlag()
     stream_info = stream_info or StreamInfo(url)
     finished = False
@@ -125,6 +122,13 @@ def download(url, filename=None, path='', stream_info=None, exit_flag=None):
                     tmp.write(str(size))
 
 
+def ensure_path(path):
+    if path and not os.path.isdir(path):
+        if os.path.isfile(path):
+            raise NameError("Path %s already exist and it's not a dir." % path)
+        os.mkdir(path)
+
+
 class MultiDownloader(object):
     def __init__(self, urls, path=''):
         """
@@ -157,6 +161,7 @@ class MultiDownloader(object):
         return {'Total:': tree}
 
     def download(self):
+        ensure_path(self.path)
         threads = []
         info_list = []
         try:
