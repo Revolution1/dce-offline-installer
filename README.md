@@ -1,6 +1,6 @@
-dce-tool init dce:1.4.1
-dce-tool init --compose=1.8.0 --dce=1.4.0 --docker=1.2.0 --lsb=centos:7.0 --image=
-dce-tool init -c config.json
+dce-tool prepare dce:1.4.1
+dce-tool prepare --compose=1.8.0 --dce=1.4.0 --docker=1.2.0 --lsb=centos:7.0 --image=
+dce-tool prepare -c config.json
 
 
 dist \

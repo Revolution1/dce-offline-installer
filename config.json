@@ -1,8 +1,8 @@
 {
   "docker": {
-    "version": "1.2.0",
+    "version": "1.12.0",
     "lsb": "centos",
-    "lsb_version": "7.1"
+    "lsb_version": "7.2"
   },
   "dce": "1.4.0",
   "compose": "1.8.0"

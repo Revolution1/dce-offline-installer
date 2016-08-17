@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-DOCKER_OFFLINE="{{docker}}"
-DOCKER_EXT_PATH="{{docker_ext_path}}"
-DCE_TAR="{{dce}}"
-COMPOSE="{{compose}}"
+DOCKER_OFFLINE="^^{docker}"
+DOCKER_EXT_PATH=${DOCKER_OFFLINE%.tar.gz}
+DCE_TAR="^^{dce}"
+COMPOSE="^^{compose}"
 
 ##### install docker #####
 

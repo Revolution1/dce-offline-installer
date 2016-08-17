@@ -147,14 +147,15 @@ class MultiDownloader(object):
             filename = get_default_filename(i.name)
             size = convertSize(i.size / 1024)
             total = convertSize(i.total / 1024)
-            name = '{index}.  {file}{space}{size}/{total}{space2}{speed}{space3}'.format(
+            # '{index}.  {file}{space}{size}/{total}{space2}{speed}{space3}'
+            name = '{index}.  {file}{space}{size}/{total}{space3}'.format(
                 index=index + 1,
                 file=filename,
                 space=' ' * (50 - len(filename)),
                 size=size,
                 total=total,
-                space2=' ' * (30 - len(size + total) + 1),
-                speed=convertSize(i.speed) + '/s' if i.progress != 100 else ' ' * 10,
+                # space2=' ' * (30 - len(size + total) + 1),
+                # speed=convertSize(i.speed) + '/s' if i.progress != 100 else ' ' * 10,
                 space3=' ' * 5
             )
             tree[name] = BarDescriptor(value=Value(i.progress), type=Bar)
