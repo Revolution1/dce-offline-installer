@@ -110,6 +110,7 @@ def prepare(config=None):
     install_script = install_template(n)
     with open(os.path.join(DIST_PATH, 'install.sh'), 'w') as f:
         f.write(install_script)
+        os.fchmod(f.fileno(), 755)
 
 
 def main():
