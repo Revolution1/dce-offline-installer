@@ -10,7 +10,7 @@ from threading import Thread
 import requests
 from blessings import Terminal
 from progressive.bar import Bar
-from progressive.tree import ProgressTree, BarDescriptor, Value
+from progressive.tree import BarDescriptor, ProgressTree, Value
 from requests.packages import urllib3
 
 urllib3.disable_warnings()
@@ -35,16 +35,20 @@ class StreamInfo(object):
         self.speed = 0
         self.progress = 0
 
-    def info(self, total, size, speed):
+    def info(self, total, size):
         self.total = total
         self.size = size
-        self.speed = speed
+        self.speed += CHUNK_SIZE
         self.progress = size * 100 / total
+
+    def clear_speed(self):
+        self.speed = 0
 
 
 TEMP_EXT_NAME = '.dce-tool.tmp'
 USER_AGENT = 'dce-tool'
 CHUNK_SIZE = 2048
+PROGRESS_INTERVAL = 0.5
 
 
 def convertSize(size):
@@ -92,10 +96,9 @@ def download(url, filename=None, path='', stream_info=None, exit_flag=None):
         total = int(r.headers.get('content-length', 0))
     else:
         total = int(r.headers.get('content-range', '0').split('/')[-1])
-    start_t = time.time()
     with open(filename, 'ab+') as f:
         if start == 0 and f.tell() == total:
-            stream_info.info(total, total, 0)
+            stream_info.info(total, total)
             return
         f.seek(start)
         f.truncate()
@@ -107,11 +110,7 @@ def download(url, filename=None, path='', stream_info=None, exit_flag=None):
                     f.write(chunk)
                     size += len(chunk)
                     f.flush()
-                current_time = time.time()
-                spend = current_time - start_t
-                speed = len(chunk) / 1024 / spend
-                stream_info.info(total, size, speed)
-                start, start_t = size, current_time
+                stream_info.info(total, size)
             finished = True
             os.remove(tmp_filename)
         except (ExitFlag, KeyboardInterrupt):
@@ -140,26 +139,28 @@ class MultiDownloader(object):
 
     def build_progress_tree(self, info_list):
         """
-        :type info: list of StreamInfo
+        :type info_list: list of StreamInfo
         """
         tree = {}
         for index, i in enumerate(info_list):
             filename = get_default_filename(i.name)
             size = convertSize(i.size / 1024)
             total = convertSize(i.total / 1024)
-            # '{index}.  {file}{space}{size}/{total}{space2}{speed}{space3}'
             name = '{index}.  {file}{space}{size}/{total}{space3}'.format(
                 index=index + 1,
                 file=filename,
                 space=' ' * (50 - len(filename)),
                 size=size,
                 total=total,
-                # space2=' ' * (30 - len(size + total) + 1),
-                # speed=convertSize(i.speed) + '/s' if i.progress != 100 else ' ' * 10,
                 space3=' ' * 5
             )
             tree[name] = BarDescriptor(value=Value(i.progress), type=Bar)
-        return {'Total:': tree}
+        speed = convertSize(sum([i.speed for i in info_list]) / 1024 / PROGRESS_INTERVAL) + '/s'
+        [i.clear_speed() for i in info_list]
+        title = 'Total:'
+        if speed:
+            title = 'Total:%s%s' % (' ' * (40 - len(title) - len(speed)), speed)
+        return {title: tree}
 
     def download(self):
         ensure_path(self.path)
@@ -177,7 +178,7 @@ class MultiDownloader(object):
             progress = ProgressTree(term=term)
             progress.make_room(self.build_progress_tree(info_list))
             while running():
-                time.sleep(0.2)
+                time.sleep(PROGRESS_INTERVAL)
                 progress.cursor.restore()
                 progress.draw(self.build_progress_tree(info_list))
             print('\nDone.')
