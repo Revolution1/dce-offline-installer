@@ -1,6 +1,8 @@
-dce-tool prepare dce:1.4.1
-dce-tool prepare --compose=1.8.0 --dce=1.4.0 --docker=1.2.0 --lsb=centos:7.0 --image=
-dce-tool prepare -c config.json
+prepare:
+
+dio prepare dce:1.4.1
+dio prepare --compose=1.8.0 --dce=1.4.0 --docker=1.2.0 --lsb=centos:7.0 --image=
+dio prepare -c config.json
 
 
 dist \
@@ -10,8 +12,9 @@ dist \
 	  			 docker-compose-Linux-x86_64
 	  			 install.sh
 
+install:
 
-dce-tool install
+dio install
 
-	pack and send dist/dce-1.4.1 to remote
-	unpack and run install.sh
+pack and send dist/dce-1.4.1 to remote
+unpack and run install.sh
