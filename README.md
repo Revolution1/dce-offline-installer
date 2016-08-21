@@ -1,6 +1,5 @@
 prepare:
 
-dio prepare dce:1.4.1
 dio prepare --compose=1.8.0 --dce=1.4.0 --docker=1.2.0 --lsb=centos:7.0 --image=
 dio prepare -c config.json
 

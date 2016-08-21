@@ -16,6 +16,7 @@ from utils import print_dict
 
 TOOL_PATH = os.path.abspath(os.path.dirname(__file__))
 DIST_PATH = 'dist'
+DIST_CONFIG = os.path.join(DIST_PATH, 'config.json')
 
 DCE_OFFLINE = 'http://get.daocloud.io/dce/'
 DOCKER_OFFLINE = 'https://get.daocloud.io/docker-offline'
@@ -65,19 +66,23 @@ def make_config(config=None):
     """
     :type config: dict
     """
-    config = config or {}
+    if not config:
+        if os.path.isfile(DIST_CONFIG):
+            config = load_json_from(DIST_CONFIG)
+        else:
+            config = {}
 
     def get_url(name, conf, releases=None):
         if not conf:
-            return latest(releases)
+            return latest(releases())
         if 'url' in conf:
-            return dict(url=conf.get('url'))
+            return conf
         if isinstance(conf, (str, unicode)):
-            for r in releases:
+            for r in releases():
                 if r['version'].lower() == conf.lower():
                     return r
             raise NoSuchVersion(name)
-        for r in releases:
+        for r in releases():
             count = len(conf)
             for k, v in conf.items():
                 if r.get(k).lower() == v.lower():
@@ -87,9 +92,9 @@ def make_config(config=None):
         raise NoSuchVersion(name)
 
     _config = copy(config)
-    _config['dce'] = get_url('dce', config.get('dce'), get_releases_of_dce())
-    _config['docker'] = get_url('docker', config.get('docker'), get_releases_of_docker())
-    _config['compose'] = get_url('compose', config.get('compose'), get_releases_of_compose())
+    _config['dce'] = get_url('dce', config.get('dce'), get_releases_of_dce)
+    _config['docker'] = get_url('docker', config.get('docker'), get_releases_of_docker)
+    _config['compose'] = get_url('compose', config.get('compose'), get_releases_of_compose)
     return _config
 
 
@@ -102,15 +107,18 @@ def prepare(config=None):
     print_dict(config)
     print('\n' + '=' * 30)
     print('\nStart Downloading ...\n')
-    dump_to(config, os.path.join(DIST_PATH, 'config.json'))
-    MultiDownloader(urls, DIST_PATH).download()
+    dump_to(config, DIST_CONFIG)
+    try:
+        MultiDownloader(urls, DIST_PATH).download()
+    except:
+        pass
     print('\nGenerate install.sh ...\n')
     n = {k: get_default_filename(v['url']) for k, v in config.items()}
     install_template = load_template('installer_template.sh')
     install_script = install_template(n)
     with open(os.path.join(DIST_PATH, 'install.sh'), 'w') as f:
         f.write(install_script)
-        os.fchmod(f.fileno(), 755)
+        os.fchmod(f.fileno(), 0b111101101)
 
 
 def main():
