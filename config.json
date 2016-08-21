@@ -5,5 +5,10 @@
     "lsb_version": "7.2"
   },
   "dce": "1.4.0",
-  "compose": "1.8.0"
+  "compose": "1.8.0",
+  "nodes": {
+    "jump_server": "",
+    "managers": [],
+    "workers": []
+  }
 }
