@@ -1,4 +1,6 @@
 # encoding=utf-8
+from __future__ import print_function
+
 import functools
 import json
 import re
@@ -114,3 +116,15 @@ def parse_doc_section(name, source):
     pattern = re.compile('^([^\n]*' + name + '[^\n]*\n?(?:[ \t].*?(?:\n|$))*)',
                          re.IGNORECASE | re.MULTILINE)
     return [s.strip() for s in pattern.findall(source)]
+
+
+def wrap_print(array, n, prefix='', **kwargs):
+    _t = []
+    for i, v in enumerate(array):
+        _t.append(v)
+        if (i + 1) % n == 0:
+            print(prefix, end='')
+            print(*_t, **kwargs)
+            _t = []
+    print('\t', end='')
+    print(*_t)

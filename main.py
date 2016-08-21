@@ -1,8 +1,14 @@
+from __future__ import print_function
+
 import logging
 import sys
 from inspect import getdoc
 
-from utils import DocoptCommand, NoSuchCommand, load_json_from, parse_doc_section
+from utils import DocoptCommand
+from utils import NoSuchCommand
+from utils import load_json_from
+from utils import parse_doc_section
+from utils import wrap_print
 
 log = logging.getLogger(__name__)
 
@@ -117,7 +123,42 @@ class TopLevelCommand(DocoptCommand):
         Options:
           -h, --help  Show this help information and exit.
         """
-        print(options)
+        _all = not any(options.values())
+
+        def list_dce():
+            from preapre import get_releases_of_dce
+            print('DCE:')
+            versions = [r['version'] for r in get_releases_of_dce()]
+            wrap_print(versions, 6, prefix='\t', sep='  ')
+            print()
+
+        def list_compose():
+            from preapre import get_releases_of_compose
+            print('Compose:')
+            versions = [r['version'] for r in get_releases_of_compose()]
+            wrap_print(versions, 6, prefix='\t', sep='  ')
+            print()
+
+        def list_docker():
+            from preapre import get_releases_of_docker
+            print('Docker:')
+            d = {}
+            for r in get_releases_of_docker():
+                if r['version'] in d:
+                    d[r['version']].append('%s:%s' % (r['lsb'], r['lsb_version']))
+                else:
+                    d[r['version']] = ['%s:%s' % (r['lsb'], r['lsb_version'])]
+            for v, l in d.items():
+                print('\t', end='')
+                print('%s (%s)' % (v, ' '.join(l)))
+            print()
+
+        if _all:
+            list_dce(), list_docker(), list_compose()
+            return
+        options.get('dce') and list_dce()
+        options.get('docker') and list_docker()
+        options.get('compose') and list_compose()
 
     def version(self, options):
         """
