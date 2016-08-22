@@ -148,7 +148,9 @@ class TopLevelCommand(DocoptCommand):
                     d[r['version']].append('%s:%s' % (r['lsb'], r['lsb_version']))
                 else:
                     d[r['version']] = ['%s:%s' % (r['lsb'], r['lsb_version'])]
-            for v, l in d.items():
+            items = d.items()
+            items.sort(reverse=True)
+            for v, l in items:
                 print('\t', end='')
                 print('%s (%s)' % (v, ' '.join(l)))
             print()
