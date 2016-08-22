@@ -78,7 +78,7 @@ class TopLevelCommand(DocoptCommand):
             try:
                 config = load_json_from(config_file)
             except Exception as e:
-                log.error('Load config file fail: %s' % e)
+                log.error("Load config file fail: %s" % e)
                 exit(1)
         dce and config.update({'dce': dce})
         compose and config.update({'compose': compose})
@@ -98,19 +98,6 @@ class TopLevelCommand(DocoptCommand):
                 config['docker'] = _d
         from preapre import prepare
         prepare(config)
-
-    def install(self, options):
-        """
-        Copy packages to nodes, install Docker and DCE
-
-        Usage:
-          install [options] [ARGS...]
-
-        Options:
-          -h, --help  Show this help information and exit.
-
-        """
-        print('install')
 
     def list(self, options):
         """
@@ -169,6 +156,19 @@ class TopLevelCommand(DocoptCommand):
         Usage: version
         """
         print('v0.1')
+
+    def install(self, options):
+        """
+        Copy packages to nodes, install Docker and DCE
+
+        Usage:
+          install [options] [ARGS...]
+
+        Options:
+          -h, --help  Show this help information and exit.
+
+        """
+        print('install')
 
 
 def main():

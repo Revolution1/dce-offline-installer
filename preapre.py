@@ -4,6 +4,7 @@ import re
 from copy import copy
 
 import requests
+from blessings import Terminal
 
 from download import MultiDownloader
 from download import ensure_path
@@ -99,26 +100,28 @@ def make_config(config=None):
 
 
 def prepare(config=None):
-    print('Preparing urls ...\n')
+    term = Terminal()
+    print("Preparing urls ...\n")
     config = make_config(config)
     ensure_path(DIST_PATH)
     urls = {k: v['url'] for k, v in config.items() if hasattr(v, '__iter__') and 'url' in v}
-    print('=' * 30 + '\n')
+    print('=' * 50 + '\n')
     print_dict({k: v for k, v in config.items() if k in urls})
-    print('\n' + '=' * 30)
-    print('\nStart Downloading ...\n')
+    print('\n' + '=' * 50)
+    print("\nStart Downloading ...\n")
     dump_to(config, DIST_CONFIG)
     try:
         MultiDownloader(urls.values(), DIST_PATH).download()
     except:
         pass
-    print('\nGenerate install.sh ...\n')
+    print("\nGenerating install.sh ...\n")
     n = {k: get_default_filename(v) for k, v in urls.items()}
     install_template = load_template('installer_template.sh')
     install_script = install_template(n)
     with open(os.path.join(DIST_PATH, 'install.sh'), 'w') as f:
         f.write(install_script)
         os.fchmod(f.fileno(), 0b111101101)
+    print(term.green("All Done!\nNow you can run install to setup you cluster!"))
 
 
 def main():

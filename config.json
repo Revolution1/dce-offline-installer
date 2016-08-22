@@ -7,8 +7,19 @@
   "dce": "1.4.0",
   "compose": "1.8.0",
   "nodes": {
-    "jump_server": "",
-    "managers": [],
-    "workers": []
+    "192.168.1.30": {
+      "role": "manager",
+      "jumper": true
+    },
+    "192.168.1.31": {
+      "role": "worker",
+      "user": "ubuntu",
+      "password": "123456"
+    },
+    "192.168.1.32": "worker",
+    "192.168.1.33": {
+      "role": "docker",
+      "key": "~/.ssh/id_rsa"
+    }
   }
 }
